@@ -45,7 +45,7 @@ function New-IRCase {
         OpenedBy      = $script:IRContext.Account
         OpenedAtUtc   = (Get-Date).ToUniversalTime().ToString('o')
         ClosedAtUtc   = $null
-        ToolVersion   = $MyInvocation.MyCommand.Module.Version.ToString()
+        ToolVersion   = $script:IRVersion
         Capability    = $script:IRContext.Capability
         Path          = $path
     }

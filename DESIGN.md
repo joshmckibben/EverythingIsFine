@@ -62,8 +62,11 @@ EverythingIsFine/                 (repo: code only, never evidence)
 │   ├── EverythingIsFine.psd1/.psm1
 │   ├── Public/                   exported functions (one per file)
 │   └── Private/                  helpers
-├── tests/                        Pester 5, all external cmdlets mocked
-└── tools/Invoke-Checks.ps1       lint + test
+├── dist/EverythingIsFine.ps1      PASTE BUILD - what engineers actually run (generated)
+├── tests/                        Pester, all external cmdlets mocked; paste build tested too
+├── tools/Build-PasteFile.ps1     src/ -> dist/ paste build
+├── tools/Invoke-Checks.ps1       build + lint + test
+└── .github/workflows/checks.yml  CI on Windows + Linux for every push
 
 $EIF_DATA_ROOT  (default ~/EverythingIsFine-Data — outside the repo)
 ├── tenants/<domain>.json         tenant profiles (pinned tenant ID, capabilities, notes)
@@ -79,6 +82,38 @@ $EIF_DATA_ROOT  (default ~/EverythingIsFine-Data — outside the repo)
 
 Evidence and client identifiers **never** go into git. The data root lives outside
 the repo on purpose.
+
+### Distribution: paste build
+
+Engineers can't run unsigned `.ps1` files on their work devices, and code pasted into a
+console isn't subject to signing. So for now **the paste build is the product**:
+
+1. Open `dist/EverythingIsFine.ps1` on GitHub (Raw), select all, copy.
+2. Paste into a PowerShell 7 console. Every function is defined in that session.
+
+How the paste file behaves:
+- `tools/Build-PasteFile.ps1` concatenates `src/` into one dot-sourced script block,
+  `. { ... }`. The console treats it as a single statement, so it all loads or none of it does.
+- The header refuses to load under Windows PowerShell 5.1 or ConstrainedLanguage mode
+  (AppLocker/WDAC), with a clear message.
+- Pasting it again (e.g. after an update) keeps the current tenant context and open case.
+- The output has no timestamps, so it's deterministic. CI fails if the committed `dist/`
+  file doesn't match `src/`.
+
+Rules this puts on source code:
+- No reliance on `$PSScriptRoot`, `$MyInvocation.MyCommand.Module` or other module or
+  script-file context inside functions. Module state lives in `$script:` variables, which
+  resolve to the global scope when pasted.
+- Here-strings are fine (lines are copied verbatim).
+- `tests/PasteBuild.Tests.ps1` loads the build in a fresh `pwsh` (global scope, no module)
+  and runs a case end to end.
+
+**Long term:** when this moves to a private repo in the MSP's organisation, sign the module
+with the organisation's code-signing certificate and import it normally. Keep the paste build
+as a fallback.
+
+Avoid `iex (irm <url>)` loaders. EDR flags them, and they run whatever is live on GitHub
+rather than a version the engineer chose.
 
 ### Conventions
 
@@ -272,7 +307,10 @@ menu entirely.
   (malicious rules, forwarding, a consented app, sign-ins from a VPS) and run the
   full flow end to end before each release.
 - **Lint:** PSScriptAnalyzer with `PSScriptAnalyzerSettings.psd1`.
-- `tools/Invoke-Checks.ps1` runs lint and tests in one go.
+- `tools/Invoke-Checks.ps1` rebuilds the paste file, then runs lint and tests.
+- **CI** (GitHub Actions) runs the same checks on `windows-latest` and `ubuntu-latest` for
+  every push, and checks the committed paste file is current. Engineers don't need to run
+  tests on their work devices.
 
 ## 10. Roadmap
 

@@ -4,6 +4,9 @@ Set-StrictMode -Version Latest
 # Holds the tenant the operator is working on, its capabilities and the open case.
 $script:IRContext = $null
 
+# Recorded in case.json. The paste build (tools/Build-PasteFile.ps1) sets this in its header instead.
+$script:IRVersion = (Import-PowerShellDataFile (Join-Path $PSScriptRoot 'EverythingIsFine.psd1')).ModuleVersion
+
 $private = @(Get-ChildItem -Path (Join-Path $PSScriptRoot 'Private') -Filter '*.ps1' -ErrorAction SilentlyContinue)
 $public  = @(Get-ChildItem -Path (Join-Path $PSScriptRoot 'Public')  -Filter '*.ps1' -ErrorAction SilentlyContinue)
 

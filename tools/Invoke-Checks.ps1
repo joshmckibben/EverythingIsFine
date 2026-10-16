@@ -1,7 +1,8 @@
 #Requires -Version 7.2
 <#
 .SYNOPSIS
-    Runs PSScriptAnalyzer and the Pester suite. Exits non-zero on any failure.
+    Rebuilds dist/EverythingIsFine.ps1, then runs PSScriptAnalyzer and the Pester suite.
+    Exits non-zero on any failure. CI runs this on Windows and Linux for every push.
 .EXAMPLE
     ./tools/Invoke-Checks.ps1
 #>
@@ -23,6 +24,9 @@ foreach ($module in @{ Name = 'Pester'; Min = '5.5.0' }, @{ Name = 'PSScriptAnal
         Install-Module $module.Name -MinimumVersion $module.Min -Scope CurrentUser -Force -SkipPublisherCheck
     }
 }
+
+Write-Host "`n== Paste build ==" -ForegroundColor Cyan
+& (Join-Path $repo 'tools' 'Build-PasteFile.ps1')
 
 Write-Host "`n== PSScriptAnalyzer ==" -ForegroundColor Cyan
 $issues = Invoke-ScriptAnalyzer -Path (Join-Path $repo 'src') -Recurse -Settings (Join-Path $repo 'PSScriptAnalyzerSettings.psd1')
