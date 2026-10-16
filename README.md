@@ -51,3 +51,8 @@ Cases/<domain>/<utc-stamp>_<ref>/
 ```powershell
 ./tools/Invoke-Checks.ps1   # PSScriptAnalyzer + Pester (all Graph/EXO calls are mocked)
 ```
+
+On Windows, run this from a PowerShell 7 (`pwsh`) terminal, or double-click
+`tools/Run-Checks.cmd`, which uses PowerShell 7 and keeps the window open.
+Don't use right-click → *Run with PowerShell*: it uses Windows PowerShell 5.1
+and closes the window before you can read the output.
