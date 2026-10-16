@@ -1,0 +1,12 @@
+# Evidence and tenant profiles live in $EIF_DATA_ROOT (default ~/EverythingIsFine-Data), never here.
+# These guard against someone pointing EIF_DATA_ROOT inside the repo by mistake.
+Cases/
+tenants/
+*.jsonl
+transcript.txt
+manifest.csv
+
+# Test / tooling output
+TestResults/
+testResults.xml
+coverage.xml
