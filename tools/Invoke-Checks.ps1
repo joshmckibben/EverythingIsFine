@@ -9,7 +9,13 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$repo = Split-Path $PSScriptRoot -Parent
+# $PSScriptRoot is empty when the script is run without a file behind it
+# (F8 / Run Selection in VS Code or ISE, pasted into a console, Invoke-Expression).
+# Fall back to the current folder in that case.
+$repo = if ($PSScriptRoot) { Split-Path $PSScriptRoot -Parent } else { (Get-Location).Path }
+if (-not (Test-Path -LiteralPath (Join-Path $repo 'src' 'EverythingIsFine' 'EverythingIsFine.psd1'))) {
+    throw "Can't find the EverythingIsFine repo at '$repo'. From the repo root, run: pwsh ./tools/Invoke-Checks.ps1"
+}
 
 foreach ($module in @{ Name = 'Pester'; Min = '5.5.0' }, @{ Name = 'PSScriptAnalyzer'; Min = '1.21.0' }) {
     if (-not (Get-Module -ListAvailable $module.Name | Where-Object Version -ge $module.Min)) {
