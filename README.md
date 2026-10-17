@@ -5,7 +5,8 @@
 PowerShell 7 toolkit for Microsoft 365 business email compromise (BEC) response:
 triage, containment, investigation and reporting, one client tenant at a time.
 
-See [DESIGN.md](DESIGN.md) for the full design and roadmap. Current milestone: **M0 (skeleton)**.
+See [DESIGN.md](DESIGN.md) for the full design and roadmap, and [LAB.md](LAB.md) for the
+test tenant and the lab seeding / cleanup tools. Current milestone: **M0.5 (lab tooling)**.
 
 ## Using it on a work device (copy and paste)
 

@@ -17,6 +17,12 @@
         'Assert-IRTenant'
         'New-IRCase'
         'Close-IRCase'
+
+        # Lab feature only (Import-Module ... -ArgumentList Lab); absent otherwise.
+        'Enable-IRLabTenant'
+        'Get-IRLabState'
+        'Invoke-IRLabSeed'
+        'Invoke-IRLabCleanup'
     )
     CmdletsToExport      = @()
     VariablesToExport    = @()

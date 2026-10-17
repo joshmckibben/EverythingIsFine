@@ -303,9 +303,11 @@ menu entirely.
   scoring) and evidence writing.
 - **Fixtures:** sanitised JSON samples of real API output under
   `tests/fixtures/`, used to test parsers and heuristics.
-- **Lab tenant:** a trial or spare tenant where we plant compromise artefacts
-  (malicious rules, forwarding, a consented app, sign-ins from a VPS) and run the
-  full flow end to end before each release.
+- **Lab tenant:** a dedicated Business Standard tenant (see [LAB.md](LAB.md)).
+  The lab feature (`Import-Module ... -ArgumentList Lab`, never in the paste build) plants
+  10 fake compromise artefacts and removes them again. It's guarded by an elevated session,
+  a local IsLab flag, an in-tenant marker app and a 50-user limit. Attacker sign-ins and
+  mailbox activity are simulated manually from another network.
 - **Lint:** PSScriptAnalyzer with `PSScriptAnalyzerSettings.psd1`.
 - `tools/Invoke-Checks.ps1` rebuilds the paste file, then runs lint and tests.
 - **CI** (GitHub Actions) runs the same checks on `windows-latest` and `ubuntu-latest` for
@@ -317,6 +319,7 @@ menu entirely.
 | # | Milestone | Exit criteria |
 |---|---|---|
 | M0 | Skeleton | Connect, tenant guard, capability check, case folder, evidence writer, tests pass |
+| M0.5 | Lab tenant tooling | `Enable-IRLabTenant`, `Invoke-IRLabSeed`, `Invoke-IRLabCleanup` with lab guards; lab tenant built per LAB.md |
 | M1 | Readiness scan | Run against every client tenant; tenant profiles and readiness reports produced |
 | M2 | Single-user triage | All Phase 2 collectors, with fallbacks, validated in the lab tenant |
 | M3 | Tenant sweep + IOC pivot | Planted lab artefacts all detected |
@@ -326,7 +329,6 @@ menu entirely.
 
 ## 11. Open questions
 
-- Which lab tenant do we use, and who owns it?
 - IP enrichment: is offline GeoLite2 alone enough, or do we want an online API key?
 - Where do case folders live: each engineer's laptop or a shared encrypted location?
 - Should the readiness scan output feed into client reporting or QBRs?
